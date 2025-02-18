@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stack Jump Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    #game-area {
+      position: relative;
+      width: 300px;
+      height: 500px;
+      background-color: #fff;
+      border: 2px solid #000;
+      overflow: hidden;
+    }
+
+    #player {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 50px;
+      background-color: #ff5722;
+      border-radius: 50%;
+    }
+
+    .block {
+      position: absolute;
+      width: 100px;
+      height: 20px;
+      background-color: #4caf50;
+    }
+
+    #ad-container {
+      width: 100%;
+      height: 50px;
+      background-color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-area">
+    <div id="player"></div>
+  </div>
+  <div id="ad-container">
+    <!-- AdMob Banner Ad Placeholder -->
+    Ad Banner Here
+  </div>
+
+  <script>
+    const gameArea = document.getElementById('game-area');
+    const player = document.getElementById('player');
+    let playerX = 125; // Initial player position
+    let blocks = [];
+    let gameSpeed = 2;
+    let score = 0;
+
+    // Create blocks
+    function createBlock() {
+      const block = document.createElement('div');
+      block.classList.add('block');
+      block.style.left = `${Math.random() * 200}px`; // Random horizontal position
+      block.style.top = `-20px`; // Start above the game area
+      gameArea.appendChild(block);
+      blocks.push(block);
+    }
+
+    // Move blocks
+    function moveBlocks() {
+      blocks.forEach((block, index) => {
+        let blockTop = parseFloat(block.style.top);
+        block.style.top = `${blockTop + gameSpeed}px`;
+
+        // Check for collision
+        if (
+          blockTop + 20 > 450 && // Block is near the bottom
+          blockTop < 500 && // Block is within the game area
+          playerX + 50 > parseFloat(block.style.left) && // Player is within the block's width
+          playerX < parseFloat(block.style.left) + 100
+        ) {
+          alert(`Game Over! Score: ${score}`);
+          resetGame();
+        }
+
+        // Remove block if it goes out of the game area
+        if (blockTop > 500) {
+          gameArea.removeChild(block);
+          blocks.splice(index, 1);
+          score++;
+        }
+      });
+    }
+
+    // Reset game
+    function resetGame() {
+      blocks.forEach(block => gameArea.removeChild(block));
+      blocks = [];
+      score = 0;
+      gameSpeed = 2;
+    }
+
+    // Player movement
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'ArrowLeft' && playerX > 0) {
+        playerX -= 20;
+      } else if (e.code === 'ArrowRight' && playerX < 250) {
+        playerX += 20;
+      }
+      player.style.left = `${playerX}px`;
+    });
+
+    // Game loop
+    function gameLoop() {
+      if (blocks.length < 5) createBlock();
+      moveBlocks();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Start the game
+    gameLoop();
+  </script>
+</body>
+</html>
